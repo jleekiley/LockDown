@@ -23,6 +23,15 @@ export default function AppTabs() {
           selectedColor="#4c4c4c"
         />
       </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="assignments">
+        <NativeTabs.Trigger.Label>Assignments</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={require('@/assets/images/tabIcons/target.png')}
+          renderingMode="template"
+          selectedColor="#4c4c4c"
+        />
+      </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
