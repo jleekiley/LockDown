@@ -1,7 +1,6 @@
 import { Text, View, StyleSheet } from "react-native";
 
 export default function Assignments() {
-
   return (
     <View style={styles.container}>
       <Text>Edit src/app/assignments.tsx to edit this screen.</Text>
