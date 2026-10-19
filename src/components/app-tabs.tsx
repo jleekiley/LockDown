@@ -33,6 +33,15 @@ export default function AppTabs() {
           selectedColor="#4c4c4c"
         />
       </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="reminders">
+        <NativeTabs.Trigger.Label>Reminders</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={require('@/assets/images/tabIcons/bell-icon.png')}
+          renderingMode="template"
+          selectedColor="#4c4c4c"
+        />
+      </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
