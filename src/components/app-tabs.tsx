@@ -6,11 +6,12 @@ export default function AppTabs() {
     <NativeTabs
       backgroundColor={useTheme().background}
       indicatorColor={useTheme().background2}
-      labelStyle={{ selected: { color: useTheme().text } }}>
+      labelStyle={{ selected: { color: useTheme().text } }}
+    >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/home.png')}
+          src={require("@/assets/images/tabIcons/home.png")}
           renderingMode="template"
           selectedColor="#4c4c4c"
         />
@@ -19,7 +20,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="goals">
         <NativeTabs.Trigger.Label>Goals</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/target.png')}
+          src={require("@/assets/images/tabIcons/target.png")}
           renderingMode="template"
           selectedColor="#4c4c4c"
         />
@@ -28,7 +29,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="assignments">
         <NativeTabs.Trigger.Label>Assignments</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/target.png')}
+          src={require("@/assets/images/tabIcons/target.png")}
           renderingMode="template"
           selectedColor="#4c4c4c"
         />

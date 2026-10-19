@@ -1,0 +1,20 @@
+{
+  "format_on_save": "on",
+  "languages": {
+    "TypeScript": {
+      "code_actions_on_format": {
+        "source.organizeImports.biome": true
+      }
+    },
+    "TSX": {
+      "code_actions_on_format": {
+        "source.organizeImports.biome": true
+      }
+    },
+    "JavaScript": {
+      "code_actions_on_format": {
+        "source.organizeImports.biome": true
+      }
+    }
+  }
+}
