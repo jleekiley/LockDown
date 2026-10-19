@@ -1,9 +1,43 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Button, ScrollView, Modal, TextInput } from "react-native";
 
 export default function Assignments() {
   return (
     <View style={styles.container}>
-      <Text>Edit src/app/assignments.tsx to edit this screen.</Text>
+      <Text>
+        Active Assignments
+      </Text>
+      <Button
+        onPress={() => {
+          return(
+            <Modal
+              animationType="fade"
+              transparent={false}
+              visible={true}
+              onRequestClose={() => {}}
+            >
+              <View style={styles.container}>
+                <Text>
+                  Add Assignment
+                </Text>
+                <TextInput
+                  placeholder="Assignment Description"
+                />
+                <TextInput
+                  placeholder="Due Date"
+                />
+              </View>
+            </Modal>
+          );
+        }}
+        title="add +"
+        color="#841584"
+        accessibilityLabel="add an assignment"
+      />
+      <ScrollView>
+        <Text> 
+          Assignment 1
+        </Text>
+      </ScrollView>
     </View>
   );
 }
@@ -11,7 +45,7 @@ export default function Assignments() {
 interface Assignment {
   description: string;
   dueDate: string;
-  extraRequriements: Assignment[];
+  extraRequirements: Assignment[];
 }
 
 const styles = StyleSheet.create({
