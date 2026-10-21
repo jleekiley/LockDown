@@ -4,18 +4,20 @@ export const Colors = {
   light: {
     background: "#F7F8FA",
     backgroundElement: "#ECEEF2",
-    backgroundSelected: "#FFFFFF",
+    backgroundSelected: "#DCE0E7",
     text: "#11181C",
     textSecondary: "#687076",
     primary: "#a21191",
+    tap: "#D0D4DC",
   },
   dark: {
     background: "#0F1115",
     backgroundElement: "#181B20",
-    backgroundSelected: "#262A32",
+    backgroundSelected: "#2A2F38",
     text: "#ECEDEE",
     textSecondary: "#9BA1A6",
     primary: "#a21191",
+    tap: "#252A34",
   },
 } as const;
 

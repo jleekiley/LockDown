@@ -8,6 +8,7 @@ export default function AppTabs() {
     <NativeTabs
       backgroundColor={theme.backgroundElement}
       indicatorColor={theme.backgroundSelected}
+      rippleColor={theme.tap}
       labelStyle={{ selected: { color: theme.text } }}
     >
       <NativeTabs.Trigger name="index">
