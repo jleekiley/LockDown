@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text>Goals Page</Text>
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText>Goals Page</ThemedText>
+    </ThemedView>
   );
 }
 

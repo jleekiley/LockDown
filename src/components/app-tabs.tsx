@@ -1,19 +1,21 @@
-import { useTheme } from "@/constants/theme";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { useTheme } from "@/constants/theme";
 
 export default function AppTabs() {
+  const theme = useTheme();
+
   return (
     <NativeTabs
-      backgroundColor={useTheme().background}
-      indicatorColor={useTheme().background2}
-      labelStyle={{ selected: { color: useTheme().text } }}
+      backgroundColor={theme.backgroundElement}
+      indicatorColor={theme.backgroundSelected}
+      labelStyle={{ selected: { color: theme.text } }}
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={require("@/assets/images/tabIcons/home.png")}
           renderingMode="template"
-          selectedColor="#4c4c4c"
+          selectedColor={theme.primary}
         />
       </NativeTabs.Trigger>
 
@@ -22,7 +24,7 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Icon
           src={require("@/assets/images/tabIcons/target.png")}
           renderingMode="template"
-          selectedColor="#4c4c4c"
+          selectedColor={theme.primary}
         />
       </NativeTabs.Trigger>
 
@@ -31,16 +33,16 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Icon
           src={require("@/assets/images/tabIcons/target.png")}
           renderingMode="template"
-          selectedColor="#4c4c4c"
+          selectedColor={theme.primary}
         />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="reminders">
         <NativeTabs.Trigger.Label>Reminders</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/bell-icon.png')}
+          src={require("@/assets/images/tabIcons/bell-icon.png")}
           renderingMode="template"
-          selectedColor="#4c4c4c"
+          selectedColor={theme.primary}
         />
       </NativeTabs.Trigger>
     </NativeTabs>
