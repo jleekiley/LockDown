@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
   },
   title: {
     height: "80%",
-    width: "60%",
     alignItems: "center",
     justifyContent: "center",
     fontSize: 20,

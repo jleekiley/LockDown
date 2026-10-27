@@ -39,6 +39,7 @@ export default function Index() {
         contentContainerStyle={{
           paddingTop: insets.top + 10,
           paddingHorizontal: 16,
+          gap: 8,
         }}
         ListEmptyComponent={<ThemedText>No goals found.</ThemedText>}
         renderItem={({ item }) => (
