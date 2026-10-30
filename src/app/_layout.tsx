@@ -6,12 +6,18 @@ import {
   ThemeProvider,
 } from "expo-router";
 import { useEffect, useState } from "react";
-import { useColorScheme } from "react-native";
+import {
+  Alert,
+  DevSettings,
+  Pressable,
+  StyleSheet,
+  useColorScheme,
+} from "react-native";
 import migrations from "@/../drizzle/migrations";
 import AppTabs from "@/components/app-tabs";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { db } from "@/db/client";
+import { db, resetDatabase } from "@/db/client";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -65,17 +71,56 @@ export default function RootLayout() {
       });
   }, []);
 
+  const handleDeleteDatabase = () => {
+    Alert.alert(
+      "Delete Database",
+      "Are you sure you want to delete the local database? All local data will be reset.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            try {
+              resetDatabase();
+              if (DevSettings.reload) {
+                DevSettings.reload();
+              } else {
+                setError(null);
+                setSuccess(false);
+                migrate(db, migrations)
+                  .then(() => {
+                    setSuccess(true);
+                  })
+                  .catch((err) => {
+                    console.error("Migration error:", err);
+                    if (err instanceof Error && err.cause) {
+                      console.error("Migration error cause:", err.cause);
+                    }
+                    setError(new Error(getErrorMessage(err)));
+                  });
+              }
+            } catch (e) {
+              console.error("Failed to delete database:", e);
+              Alert.alert("Error", e instanceof Error ? e.message : String(e));
+            }
+          },
+        },
+      ],
+    );
+  };
+
   if (error) {
     return (
-      <ThemedView
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 16,
-        }}
-      >
-        <ThemedText>Migration error: {error.message}</ThemedText>
+      <ThemedView style={styles.errorContainer}>
+        <ThemedText style={styles.errorText}>
+          Migration error: {error.message}
+        </ThemedText>
+        <Pressable style={styles.deleteButton} onPress={handleDeleteDatabase}>
+          <ThemedText style={styles.deleteButtonText}>
+            Delete Database
+          </ThemedText>
+        </Pressable>
       </ThemedView>
     );
   }
@@ -90,3 +135,27 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  errorText: {
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  deleteButton: {
+    backgroundColor: "#e53935",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+});

@@ -1,5 +1,19 @@
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite";
+import { deleteDatabaseSync, openDatabaseSync } from "expo-sqlite";
 
-const expo = openDatabaseSync("app.db", { enableChangeListener: true });
-export const db = drizzle(expo);
+export const DB_NAME = "app.db";
+
+export let expo = openDatabaseSync(DB_NAME, { enableChangeListener: true });
+export let db = drizzle(expo);
+
+export function resetDatabase() {
+  try {
+    expo.closeSync();
+  } catch (e) {
+    console.warn("Error closing database:", e);
+  }
+  deleteDatabaseSync(DB_NAME);
+  expo = openDatabaseSync(DB_NAME, { enableChangeListener: true });
+  db = drizzle(expo);
+}
+
