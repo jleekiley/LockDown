@@ -1,0 +1,142 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "id": "265d6253-da6a-4bb3-b67e-54427ac62e65",
+  "prevIds": [
+    "425e6f3d-333c-423f-b9ac-e2da1e385f3b"
+  ],
+  "ddl": [
+    {
+      "name": "assignments",
+      "entityType": "tables"
+    },
+    {
+      "name": "goals",
+      "entityType": "tables"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "assignments"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "title",
+      "entityType": "columns",
+      "table": "assignments"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "description",
+      "entityType": "columns",
+      "table": "assignments"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "dueDate",
+      "entityType": "columns",
+      "table": "assignments"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "parentTaskId",
+      "entityType": "columns",
+      "table": "assignments"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": true,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "goals"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "title",
+      "entityType": "columns",
+      "table": "goals"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "description",
+      "entityType": "columns",
+      "table": "goals"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "name": "complete",
+      "entityType": "columns",
+      "table": "goals"
+    },
+    {
+      "columns": [
+        "parentTaskId"
+      ],
+      "tableTo": "assignments",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "nameExplicit": false,
+      "name": "fk_assignments_parentTaskId_assignments_id_fk",
+      "entityType": "fks",
+      "table": "assignments"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "assignments_pk",
+      "table": "assignments",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "goals_pk",
+      "table": "goals",
+      "entityType": "pks"
+    }
+  ],
+  "renames": []
+}
