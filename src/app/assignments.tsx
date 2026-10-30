@@ -1,35 +1,39 @@
 import { useState } from "react";
-import { Button, Modal, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, Modal, ScrollView, StyleSheet, TextInput } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useTheme } from "@/constants/theme";
 
 export default function Assignments() {
+  const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <Modal
         animationType="fade"
         transparent={false}
         visible={modalVisible}
-        onRequestClose={() => {}}
+        onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.container}>
-          <Text>Add Assignment</Text>
+        <ThemedView style={styles.container}>
+          <ThemedText>Add Assignment</ThemedText>
           <TextInput placeholder="Assignment Description" />
           <TextInput placeholder="Due Date" />
-        </View>
+        </ThemedView>
       </Modal>
-      <Text>Active Assignments</Text>
+      <ThemedText>Active Assignments</ThemedText>
       <Button
         onPress={() => {
           setModalVisible(true);
         }}
         title="add +"
-        color="#841584"
+        color={theme.primary}
         accessibilityLabel="add an assignment"
       />
       <ScrollView>
-        <Text>Assignment 1</Text>
+        <ThemedText>Assignment 1</ThemedText>
       </ScrollView>
-    </View>
+    </ThemedView>
   );
 }
 
