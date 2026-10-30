@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Modal, ScrollView, StyleSheet, TextInput } from "react-native";
+import ThemedModal from "@/components/modal";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTheme } from "@/constants/theme";
@@ -9,18 +10,15 @@ export default function Assignments() {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <ThemedView style={styles.container}>
-      <Modal
-        animationType="fade"
-        transparent={false}
+      <ThemedModal
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        title="test"
+        onClose={() => setModalVisible(false)}
       >
-        <ThemedView style={styles.container}>
-          <ThemedText>Add Assignment</ThemedText>
-          <TextInput placeholder="Assignment Description" />
-          <TextInput placeholder="Due Date" />
-        </ThemedView>
-      </Modal>
+        <ThemedText>Add Assignment</ThemedText>
+        <TextInput placeholder="Assignment Description" />
+        <TextInput placeholder="Due Date" />
+      </ThemedModal>
       <ThemedText>Active Assignments</ThemedText>
       <Button
         onPress={() => {
