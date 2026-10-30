@@ -6,36 +6,77 @@ import {
   ThemeProvider,
 } from "expo-router";
 import { useEffect, useState } from "react";
-import { useColorScheme, View } from "react-native";
+import { useColorScheme } from "react-native";
 import migrations from "@/../drizzle/migrations";
 import AppTabs from "@/components/app-tabs";
 import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { db } from "@/db/client";
 
 SplashScreen.preventAutoHideAsync();
 
+function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    let causeMessage: string | null = null;
+    let current: unknown = err.cause;
+    while (current) {
+      if (current instanceof Error) {
+        causeMessage = current.message;
+        current = current.cause;
+      } else if (
+        typeof current === "object" &&
+        current !== null &&
+        "message" in current
+      ) {
+        causeMessage = String((current as { message: unknown }).message);
+        break;
+      } else {
+        causeMessage = String(current);
+        break;
+      }
+    }
+
+    if (causeMessage) {
+      return `${causeMessage}\n\n${err.message}`;
+    }
+    return err.message;
+  }
+  return String(err);
+}
+
 export default function RootLayout() {
-  const [success, setSucess] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const colorScheme = useColorScheme();
 
   useEffect(() => {
     migrate(db, migrations)
       .then(() => {
-        setSucess(true);
+        setSuccess(true);
         SplashScreen.hideAsync();
       })
       .catch((err) => {
-        setError(err instanceof Error ? err : new Error(String(err)));
+        console.error("Migration error:", err);
+        if (err instanceof Error && err.cause) {
+          console.error("Migration error cause:", err.cause);
+        }
+        setError(new Error(getErrorMessage(err)));
         SplashScreen.hideAsync();
       });
   }, []);
 
   if (error) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ThemedView
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 16,
+        }}
+      >
         <ThemedText>Migration error: {error.message}</ThemedText>
-      </View>
+      </ThemedView>
     );
   }
 
