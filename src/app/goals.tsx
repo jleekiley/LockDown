@@ -10,7 +10,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTheme } from "@/constants/theme";
 import { db } from "@/db/client";
-import { Goal, goals, NewGoal } from "@/db/schema";
+import type { Goal, NewGoal } from "@/db/schema";
+import { goals } from "@/db/schema";
 
 export default function Index() {
   const { data: goalsList } = useLiveQuery(
