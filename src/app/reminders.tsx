@@ -157,7 +157,7 @@ export default function NotificationsTab() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={styles.heading}>This is the reminders tab</Text>
+      <Text style={[styles.heading, { color: theme.text }]}>This is the reminders tab</Text>
 
       {/**dissapear when adding */}
       {!popup && (
