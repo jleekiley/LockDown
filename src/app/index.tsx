@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text>Edit src/app/index.tsx to edit this screen.</Text>
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title}> Welcome to LOCKDOWN </ThemedText>
+    </ThemedView>
   );
 }
 
@@ -13,5 +15,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  title: {
+    height: "80%",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 20,
   },
 });

@@ -89,6 +89,10 @@ class Reminder {
   repeats: boolean;
   rep_list: boolean[];
   curr_day: number = 3; //testing value, should be set for days of the week
+  name: string;
+  repeats: boolean;
+  rep_list: boolean[];
+  curr_day: number = 3; //testing value, should be set for days of the week
 
   /*for starting purposes kept as 3 seperate values,
    *could be set as one fixed length string of numbers in the
@@ -467,11 +471,13 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     fontWeight: "bold",
+    fontWeight: "bold",
     marginBottom: 20,
   },
   text: {
     fontSize: 16,
   },
+  button: {
   button: {
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -499,6 +505,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   buttonText: {
+    color: "#fff",
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
