@@ -1,4 +1,4 @@
-import { AnySQLiteColumn, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { type AnySQLiteColumn, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const goals = sqliteTable("goals", {
   id: int().primaryKey({ autoIncrement: true }),
@@ -11,10 +11,10 @@ export const assignments = sqliteTable("assignments", {
   id: int().primaryKey({ autoIncrement: true }),
   title: text().notNull(),
   description: text(),
-  dueDate: text(),
+  dueDate: int({ mode: "timestamp_ms" }),
   parentTaskId: int().references((): AnySQLiteColumn => assignments.id, {
-    onDelete: "set null"
-  })
+    onDelete: "set null",
+  }),
 });
 
 export type Goal = typeof goals.$inferSelect;
