@@ -1,20 +1,24 @@
+import { asc, desc } from "drizzle-orm";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useState } from "react";
-import { Button, Modal, ScrollView, StyleSheet, TextInput } from "react-native";
+import { Button, ScrollView, StyleSheet, TextInput } from "react-native";
 import ThemedModal from "@/components/modal";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useTheme } from "@/constants/theme";
+import { db } from "@/db/client";
+//import type { Assignment, NewAssignment } from "@/db/schema";
+import { assignments } from "@/db/schema";
 
 export default function Assignments() {
   const theme = useTheme();
+  const { data: tasksList } = useLiveQuery(
+    db.select().from(assignments).orderBy(asc(assignments.dueDate), desc(assignments.id)),
+  );
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <ThemedView style={styles.container}>
-      <ThemedModal
-        visible={modalVisible}
-        title="test"
-        onClose={() => setModalVisible(false)}
-      >
+      <ThemedModal visible={modalVisible} title="test" onClose={() => setModalVisible(false)}>
         <ThemedText>Add Assignment</ThemedText>
         <TextInput placeholder="Assignment Description" />
         <TextInput placeholder="Due Date" />
@@ -33,12 +37,6 @@ export default function Assignments() {
       </ScrollView>
     </ThemedView>
   );
-}
-
-interface Assignment {
-  description: string;
-  dueDate: string;
-  extraRequirements: Assignment[];
 }
 
 const styles = StyleSheet.create({
