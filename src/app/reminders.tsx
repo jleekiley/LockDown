@@ -89,10 +89,6 @@ class Reminder {
   repeats: boolean;
   rep_list: boolean[];
   curr_day: number = 3; //testing value, should be set for days of the week
-  name: string;
-  repeats: boolean;
-  rep_list: boolean[];
-  curr_day: number = 3; //testing value, should be set for days of the week
 
   /*for starting purposes kept as 3 seperate values,
    *could be set as one fixed length string of numbers in the
@@ -183,9 +179,9 @@ export default function NotificationsTab() {
 
       {popup && (
         //popup box and general styling
-        <KeyboardAvoidingView style={[styles.popup, { backgroundColor: theme.background2 }]}>
+        <KeyboardAvoidingView style={[styles.popup, { backgroundColor: theme.backgroundElement }]}>
           {/*popup line specific styling*/}
-          <View style={[styles.closeButton, { backgroundColor: theme.background2 }]}>
+          <View style={[styles.closeButton, { backgroundColor: theme.backgroundElement }]}>
             <Pressable onPress={() => setPopup(false)}>
               <Text style={[styles.roundButton, { color: theme.text, backgroundColor: "red" }]}>
                 X
@@ -196,7 +192,11 @@ export default function NotificationsTab() {
           <View
             style={[
               styles.rowPop,
-              { backgroundColor: theme.background2, flexDirection: "row", alignItems: "center" },
+              {
+                backgroundColor: theme.backgroundElement,
+                flexDirection: "row",
+                alignItems: "center",
+              },
             ]}
           >
             <Text style={[styles.buttonText, { color: theme.text }]}>Reminder name:</Text>
@@ -212,7 +212,11 @@ export default function NotificationsTab() {
           <View
             style={[
               styles.rowPop,
-              { backgroundColor: theme.background2, flexDirection: "row", alignItems: "center" },
+              {
+                backgroundColor: theme.backgroundElement,
+                flexDirection: "row",
+                alignItems: "center",
+              },
             ]}
           >
             <Text style={[styles.buttonText, { color: theme.text }]}>Course Name:</Text>
@@ -228,7 +232,11 @@ export default function NotificationsTab() {
           <View
             style={[
               styles.rowPop,
-              { backgroundColor: theme.background2, flexDirection: "row", alignItems: "center" },
+              {
+                backgroundColor: theme.backgroundElement,
+                flexDirection: "row",
+                alignItems: "center",
+              },
             ]}
           >
             <Text style={[styles.buttonText, { color: theme.text }]}>Enter time:</Text>
@@ -259,7 +267,11 @@ export default function NotificationsTab() {
           <View
             style={[
               styles.rowPop,
-              { backgroundColor: theme.background2, flexDirection: "row", alignItems: "center" },
+              {
+                backgroundColor: theme.backgroundElement,
+                flexDirection: "row",
+                alignItems: "center",
+              },
             ]}
           >
             <Text style={[styles.buttonText, { color: theme.text }]}>Start date(M/D): </Text>
@@ -286,7 +298,11 @@ export default function NotificationsTab() {
           <View
             style={[
               styles.rowPop,
-              { backgroundColor: theme.background2, flexDirection: "column", alignItems: "center" },
+              {
+                backgroundColor: theme.backgroundElement,
+                flexDirection: "column",
+                alignItems: "center",
+              },
             ]}
           >
             {/**this one should add another row of 7 buttons representing days
@@ -307,7 +323,7 @@ export default function NotificationsTab() {
                 style={[
                   styles.rowPop,
                   {
-                    backgroundColor: theme.background2,
+                    backgroundColor: theme.backgroundElement,
                     flexDirection: "row",
                     alignItems: "center",
                   },
@@ -471,13 +487,11 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    fontWeight: "bold",
     marginBottom: 20,
   },
   text: {
     fontSize: 16,
   },
-  button: {
   button: {
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -505,7 +519,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   buttonText: {
-    color: "#fff",
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
