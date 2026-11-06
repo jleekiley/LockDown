@@ -6,15 +6,19 @@ export default function AppTabs() {
 
   return (
     <NativeTabs
+      labelVisibilityMode="labeled"
       backgroundColor={theme.backgroundElement}
       indicatorColor={theme.backgroundSelected}
       rippleColor={theme.tap}
-      labelStyle={{ selected: { color: theme.text } }}
+      labelStyle={{
+        default: { color: theme.textSecondary },
+        selected: { color: theme.text },
+      }}
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/home.png")}
+          md="home"
           renderingMode="template"
           selectedColor={theme.primary}
         />
@@ -23,7 +27,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="goals">
         <NativeTabs.Trigger.Label>Goals</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/target.png")}
+          md="target"
           renderingMode="template"
           selectedColor={theme.primary}
         />
@@ -32,7 +36,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="assignments">
         <NativeTabs.Trigger.Label>Assignments</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/target.png")}
+          md="target"
           renderingMode="template"
           selectedColor={theme.primary}
         />
@@ -41,7 +45,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="reminders">
         <NativeTabs.Trigger.Label>Reminders</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require("@/assets/images/tabIcons/bell-icon.png")}
+          md={"notifications"}
           renderingMode="template"
           selectedColor={theme.primary}
         />
