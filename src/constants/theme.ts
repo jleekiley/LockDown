@@ -8,6 +8,7 @@ export const Colors = {
     text: "#11181C",
     textSecondary: "#687076",
     primary: "#a21191",
+    onPrimary: "#FFFFFF",
     tap: "#D0D4DC",
   },
   dark: {
@@ -17,6 +18,7 @@ export const Colors = {
     text: "#ECEDEE",
     textSecondary: "#9BA1A6",
     primary: "#a21191",
+    onPrimary: "#FFFFFF",
     tap: "#252A34",
   },
 } as const;
