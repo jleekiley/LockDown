@@ -171,6 +171,8 @@ export default function Assignments() {
         {/* Button for adding assignments (Triggers Modal Popup) */}
         <Button
           onPress={() => {
+            setNewTask(INITIAL_ASSIGNMENT);
+            setNewDT(INITIAL_DT);
             setModalVisible(true);
           }}
           title="add +"
