@@ -24,7 +24,7 @@ export const assignments = sqliteTable("assignments", {
 });
 
 export const reminders = sqliteTable("reminders", {
-  //id: int().primaryKey({ autoIncrement: true }),
+  id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   month: int().notNull(),
   date: int().notNull(),
