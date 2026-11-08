@@ -6,6 +6,7 @@ import m0002 from './20261106183151_even_forgotten_one/migration.sql';
 import m0003 from './20261108164352_pale_lockheed/migration.sql';
 import m0004 from './20261108205345_crazy_blockbuster/migration.sql';
 import m0005 from './20261108220504_steep_dexter_bennett/migration.sql';
+import m0006 from './20261108221159_classy_wither/migration.sql';
 
   export default {
     migrations: {
@@ -14,7 +15,8 @@ import m0005 from './20261108220504_steep_dexter_bennett/migration.sql';
 "20261106183151_even_forgotten_one": m0002,
 "20261108164352_pale_lockheed": m0003,
 "20261108205345_crazy_blockbuster": m0004,
-"20261108220504_steep_dexter_bennett": m0005
+"20261108220504_steep_dexter_bennett": m0005,
+"20261108221159_classy_wither": m0006
 }
   }
   

@@ -24,7 +24,7 @@ export const assignments = sqliteTable("assignments", {
 });
 
 export const reminders = sqliteTable("reminders", {
-  //id: int().primaryKey({ autoIncrement: true }),
+  id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   month: int().notNull(),
   date: int().notNull(),
@@ -39,5 +39,3 @@ export type Goal = typeof goals.$inferSelect;
 export type NewGoal = typeof goals.$inferInsert;
 export type Assignment = typeof assignments.$inferSelect;
 export type NewAssignment = typeof assignments.$inferInsert;
-export type Reminder = typeof reminders.$inferSelect;
-export type NewReminder = typeof reminders.$inferInsert;
