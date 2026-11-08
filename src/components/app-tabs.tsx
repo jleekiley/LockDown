@@ -36,7 +36,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="assignments">
         <NativeTabs.Trigger.Label>Assignments</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          md="target"
+          md="assignment"
           renderingMode="template"
           selectedColor={theme.primary}
         />
