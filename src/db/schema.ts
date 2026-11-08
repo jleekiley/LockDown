@@ -15,6 +15,7 @@ export const assignments = sqliteTable("assignments", {
   parentTaskId: int().references((): AnySQLiteColumn => assignments.id, {
     onDelete: "set null",
   }),
+  complete: int({ mode: "boolean" }).notNull().default(false),
 });
 
 export type Goal = typeof goals.$inferSelect;
