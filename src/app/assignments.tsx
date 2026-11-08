@@ -38,7 +38,10 @@ export default function Assignments() {
   const theme = useTheme();
   // Retrieving assignments from db
   const { data: tasksList } = useLiveQuery(
-    db.select().from(assignments).orderBy(asc(assignments.dueDate), desc(assignments.id)),
+    db
+      .select()
+      .from(assignments)
+      .orderBy(asc(assignments.dueDate), desc(assignments.id)),
   );
 
   const toggleTask = async (task: Assignment) => {
@@ -69,18 +72,18 @@ export default function Assignments() {
     }
   };
 
-  const parseTime = (time:string) => {
-    let cleaned = time.replace(/[^0-9]/g, '');
+  const parseTime = (time: string) => {
+    let cleaned = time.replace(/[^0-9]/g, "");
     // Limit maximum length to 4 digits (HHMM)
     if (cleaned.length > 4) {
       cleaned = cleaned.slice(0, 4);
     }
     // Prevent invalid first digits for hour (max 2)
     if (cleaned.length >= 1 && parseInt(cleaned[0]) > 2) {
-      return; 
+      return;
     }
     // Prevent invalid second digits if first digit is 2 (max 23 hours)
-    if (cleaned.length >= 2 && cleaned[0] === '2' && parseInt(cleaned[1]) > 3) {
+    if (cleaned.length >= 2 && cleaned[0] === "2" && parseInt(cleaned[1]) > 3) {
       return;
     }
     // Prevent invalid first digit for minutes (max 59 minutes)
@@ -92,11 +95,11 @@ export default function Assignments() {
     if (cleaned.length > 2) {
       formatted = `${cleaned.slice(0, 2)}:${cleaned.slice(2)}`;
     }
-    return(formatted);
-  }
+    return formatted;
+  };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Modal for adding assignments */}
       <ThemedModal
         visible={modalVisible}
@@ -163,16 +166,18 @@ export default function Assignments() {
           />
         )}
       </ThemedModal>
-      <ThemedText>Active Assignments</ThemedText>
-      {/* Button for adding assignments (Triggers Modal Popup) */}
-      <Button
-        onPress={() => {
-          setModalVisible(true);
-        }}
-        title="add +"
-        color={theme.primary}
-        accessibilityLabel="add an assignment"
-      />
+      <ThemedView style={styles.container2}>
+        <ThemedText>Active Assignments</ThemedText>
+        {/* Button for adding assignments (Triggers Modal Popup) */}
+        <Button
+          onPress={() => {
+            setModalVisible(true);
+          }}
+          title="add +"
+          color={theme.primary}
+          accessibilityLabel="add an assignment"
+        />
+      </ThemedView>
       {/* List of assignments (from db) */}
       <Animated.FlatList
         data={tasksList}
@@ -212,6 +217,8 @@ export type DT = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  container2: {
     alignItems: "center",
     justifyContent: "center",
   },
