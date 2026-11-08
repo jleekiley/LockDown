@@ -1,6 +1,7 @@
 import DateTimePicker from "@expo/ui/community/datetime-picker";
-import { asc, desc } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
+import { Checkbox } from "expo-checkbox";
 import { useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -40,6 +41,17 @@ export default function Assignments() {
     db.select().from(assignments).orderBy(asc(assignments.dueDate), desc(assignments.id)),
   );
 
+  const toggleTask = async (task: Assignment) => {
+    try {
+      await db
+        .update(assignments)
+        .set({ complete: !task.complete })
+        .where(eq(assignments.id, task.id));
+    } catch (err) {
+      console.error("Failed to toggle goal:", err);
+    }
+  };
+
   const addTask = async (task: NewAssignment) => {
     try {
       await db
@@ -66,7 +78,10 @@ export default function Assignments() {
         onClose={() => setModalVisible(false)}
         onSave={() => {
           // Save the new assignment to the database
-          //
+          const tempDate = newDT.date || new Date();
+          tempDate.setHours(parseInt(newDT.time.split(":")[0]) || 0);
+          tempDate.setMinutes(parseInt(newDT.time.split(":")[1]) || 0);
+          addTask({ ...newTask, dueDate: tempDate });
           setModalVisible(false);
         }}
       >
@@ -143,7 +158,18 @@ export default function Assignments() {
         }}
         ListEmptyComponent={<ThemedText>No assignments found.</ThemedText>}
         renderItem={({ item }) => (
-          <ListItem title={item.title} subtitle={item.description} onPress={() => {}}></ListItem>
+          <ListItem
+            title={item.title}
+            subtitle={item.description}
+            onPress={() => {}}
+            leading={
+              <Checkbox
+                value={item.complete}
+                onValueChange={() => toggleTask(item)}
+                color={item.complete ? theme.primary : undefined}
+              />
+            }
+          />
         )}
       ></Animated.FlatList>
     </ThemedView>
