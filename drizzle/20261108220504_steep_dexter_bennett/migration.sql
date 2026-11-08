@@ -1,0 +1,1 @@
+ALTER TABLE `assignments` ADD `complete` integer DEFAULT false NOT NULL;
