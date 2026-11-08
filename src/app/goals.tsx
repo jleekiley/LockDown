@@ -40,13 +40,7 @@ export default function Index() {
 
   const addGoal = async (goal: NewGoal) => {
     try {
-      await db
-        .insert(goals)
-        .values({
-          title: goal.title,
-          description: goal.description,
-        })
-        .onConflictDoNothing();
+      await db.insert(goals).values(goal).onConflictDoNothing();
     } catch (error) {
       console.error("Failed to add goal:", error);
       throw error;
