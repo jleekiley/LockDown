@@ -9,10 +9,15 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { db } from "@/db/client";
+import type { NewReminder, Reminder } from "@/db/schema";
+import { reminders } from "@/db/schema";
 import { useTheme } from "../constants/theme";
 
 //Key Variables
 const { width, height } = Dimensions.get("window");
+//const {Reminder, NewReminder} = useState<Reminder>
+
 /**
 function getCurrDate() {
   //create a new date object to store the current time
@@ -26,6 +31,8 @@ function getCurrDate() {
   curr_hour: curr.getHours();
   curr_min: curr.getMinutes();
 } */
+
+/*function checkRepetition() {}*/
 
 //current time values should be moved to a different function
 function CreateReminder(
@@ -44,24 +51,9 @@ function CreateReminder(
   if (!dayHalf) {
     hour += 12;
   }
-  console.log(
-    "Added reminder with:\n" +
-      "name: " +
-      name +
-      " month: " +
-      month +
-      " date: " +
-      date +
-      " weekday: " +
-      weekday +
-      " hour: " +
-      hour +
-      " min: " +
-      min +
-      " repeating: " +
-      repeating,
-  );
-  new Reminder(name, month, date, weekday, hour, min, false, []);
+  new Reminder_class(name, month, date, weekday, hour, min, repeating, repeatList);
+
+  storeRem(name, month, date, weekday, hour, min, repeating, repeatList);
 }
 /**
 function testing() {
@@ -84,13 +76,13 @@ function testing() {
   );
 }*/
 
-class Reminder {
+class Reminder_class {
   name: string;
   repeats: boolean;
   rep_list: boolean[];
   curr_day: number = 3; //testing value, should be set for days of the week
 
-  /*for starting purposes kept as 3 seperate values,
+  /*for starting purposes kept as seperate values,
    *could be set as one fixed length string of numbers in the
    *format of:
    *{1-digit: day}{2-digit: hour}{2-digit: minute}
@@ -123,13 +115,30 @@ class Reminder {
   }
 }
 
-/*
-const createRemWindow = () => {
-  return (
-
-  );
-};
-*/
+async function storeRem(
+  name: string,
+  month: number,
+  date: number,
+  weekday: number,
+  hour: number,
+  min: number,
+  repeating: boolean,
+  repeatList: boolean[],
+) {
+  await db
+    .insert(reminders)
+    .values({
+      name: name,
+      month: month,
+      date: date,
+      weekday: weekday,
+      hour: hour,
+      min: min,
+      repeating: repeating,
+      repeatList: repeatList,
+    });
+  console.log("You should have added to the database here");
+}
 
 function checkNum(text: string, min: number, max: number) {
   text = text.replace(/[^0-9]/g, "");
@@ -169,11 +178,7 @@ export default function NotificationsTab() {
           //determines look of the button
           style={({ pressed }) => [styles.button, { backgroundColor: "#4f6eb7" }]}
         >
-          {({ pressed }) => (
-            <Text style={styles.buttonText}>
-              {reminders.length == 0 ? "Add Reminder" : "Num reminders: " + reminders.length}
-            </Text>
-          )}
+          {({ pressed }) => <Text style={styles.buttonText}>"Add Reminder"</Text>}
         </Pressable>
       )}
 
@@ -244,7 +249,7 @@ export default function NotificationsTab() {
               placeholder="Hour"
               placeholderTextColor={theme.text}
               onChangeText={(newText) => setHour(Number(checkNum(newText, 1, 12)))}
-              defaultValue={"12"}
+              defaultValue={String(hour)}
               keyboardType="number-pad"
               style={[styles.defaultText, { borderColor: theme.text, color: theme.text }]}
             />
@@ -252,7 +257,7 @@ export default function NotificationsTab() {
             <TextInput
               placeholder="Minute"
               placeholderTextColor={theme.text}
-              onChangeText={(newText) => setMin(Number(checkNum(newText, 0, 60)))}
+              onChangeText={(newText) => setMin(Number(checkNum(newText, 0, 59)))}
               defaultValue={"00"}
               keyboardType="number-pad"
               style={[styles.defaultText, { borderColor: theme.text, color: theme.text }]}
@@ -412,30 +417,16 @@ export default function NotificationsTab() {
             <Pressable
               //what happens when the button is pressed
               onPress={() => {
-                const month = curr.getMonth();
-                const date = curr.getDate();
-                //new Reminder(name, month, date, weekday, hour, dayHalf, min, false, []);
-                reminders.push(
-                  CreateReminder(
-                    name,
-                    remindMonth,
-                    remindStart,
-                    0 /**this is day of week */,
-                    hour,
-                    half,
-                    min,
-                    false,
-                    [],
-                  ),
+                const today = curr.getDay();
+                //creates a reminder class object locally
+
+                //adds a reminder to the database:
+                CreateReminder(name, remindMonth, remindStart, today, hour, half, min, repeats, repeatList,
                 );
               }} //determines look of the button
               style={({ pressed }) => [styles.button, { backgroundColor: "#4f6eb7" }]}
             >
-              {({ pressed }) => (
-                <Text style={styles.buttonText}>
-                  {reminders.length == 0 ? "Create Reminder" : "Num reminders: " + reminders.length}
-                </Text>
-              )}
+              {({ pressed }) => <Text style={styles.buttonText}>"Create Reminder"</Text>}
             </Pressable>
           </View>
 
