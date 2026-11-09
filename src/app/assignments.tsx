@@ -1,5 +1,5 @@
 import DateTimePicker from "@expo/ui/community/datetime-picker";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Checkbox } from "expo-checkbox";
 import { useState } from "react";
@@ -41,7 +41,7 @@ export default function Assignments() {
     db
       .select()
       .from(assignments)
-      .orderBy(asc(assignments.dueDate), desc(assignments.id)),
+      .orderBy(asc(assignments.complete), asc(assignments.dueDate), asc(assignments.id)),
   );
 
   const toggleTask = async (task: Assignment) => {
@@ -195,6 +195,7 @@ export default function Assignments() {
           <ListItem
             title={item.title}
             subtitle={item.description}
+            strikethrough={item.complete}
             onPress={() => {}}
             leading={
               <Checkbox
@@ -223,5 +224,9 @@ const styles = StyleSheet.create({
   container2: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  strikethrough: {
+    textDecorationLine: "line-through",
+    opacity: 0.5,
   },
 });
