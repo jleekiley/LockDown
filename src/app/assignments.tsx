@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useParseIntRadix: error cannot occur given context */
 import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
@@ -194,7 +195,9 @@ export default function Assignments() {
         renderItem={({ item }) => (
           <ListItem
             title={item.title}
-            subtitle={item.description}
+            subtitle={
+              `${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}`
+            }
             strikethrough={item.complete}
             onPress={() => {}}
             leading={
