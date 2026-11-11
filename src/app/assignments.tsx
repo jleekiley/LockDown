@@ -52,7 +52,7 @@ export default function Assignments() {
         .set({ complete: !task.complete })
         .where(eq(assignments.id, task.id));
     } catch (err) {
-      console.error("Failed to toggle goal:", err);
+      console.error("Failed to toggle assignment:", err);
     }
   };
 
@@ -166,6 +166,9 @@ export default function Assignments() {
             positiveButton={{ label: "Set" }}
           />
         )}
+        <>  
+          { /* Dropdown for parent task */ }
+        </>
       </ThemedModal>
       <ThemedView style={styles.container2}>
         <ThemedText>Active Assignments</ThemedText>
