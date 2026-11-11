@@ -13,6 +13,7 @@ import { ListItem } from "@/components/list-item";
 import { Goal } from "@/db/schema";
 import Checkbox from "expo-checkbox";
 import { View } from "react-native";
+import { navigate } from "expo-router/build/global-state/router";
 
 
 
@@ -38,9 +39,12 @@ export default function Index() {
         ListEmptyComponent={<ThemedText>No assignments found.</ThemedText>}
         renderItem={({ item }) => (
           <ListItem
-            title={item.title}
+            title={item.title}   
             subtitle={item.description}
-            onPress={() => { } } />
+            onPress={() => { 
+                navigate('/assignments')
+              } }
+          ></ListItem>  
         )}
       ></Animated.FlatList>
     </ThemedView><ThemedView style={[styles.list]}>
@@ -53,7 +57,9 @@ export default function Index() {
             <ListItem
               title={item.title}
               subtitle={item.description}
-              onPress={() => { } } />
+              onPress={() => { 
+                navigate('/goals')
+              } } />
           )}
         ></Animated.FlatList>
       </ThemedView></>
@@ -81,4 +87,9 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
   },
+  left_info: {
+    margin: 16,
+    maxWidth: 25
+  },
+  
 });
