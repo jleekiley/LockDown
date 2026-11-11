@@ -5,6 +5,7 @@ import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Checkbox } from "expo-checkbox";
 import { useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ListItem } from "@/components/list-item";
@@ -166,9 +167,25 @@ export default function Assignments() {
             positiveButton={{ label: "Set" }}
           />
         )}
-        <>  
-          { /* Dropdown for parent task */ }
-        </>
+        <SelectList
+          setSelected={(key: string) => {
+            setNewTask((prev) => ({
+              ...prev,
+              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
+            }));
+          }}
+          data={[
+            { key: "none", value: "-- none --" },
+            ...(tasksList?.map((task) => ({ key: task.id.toString(), value: task.title })) ?? []),
+          ]}
+          save="key"
+          onSelect={(key?: string) => {
+            setNewTask((prev) => ({
+              ...prev,
+              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
+            }));
+          }}
+        />
       </ThemedModal>
       <ThemedView style={styles.container2}>
         <ThemedText>Active Assignments</ThemedText>
@@ -198,9 +215,7 @@ export default function Assignments() {
         renderItem={({ item }) => (
           <ListItem
             title={item.title}
-            subtitle={
-              `${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}`
-            }
+            subtitle={`${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}`}
             strikethrough={item.complete}
             onPress={() => {}}
             leading={
@@ -212,7 +227,7 @@ export default function Assignments() {
             }
           />
         )}
-      ></Animated.FlatList>
+      />
     </ThemedView>
   );
 }
