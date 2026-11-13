@@ -2,8 +2,11 @@ import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { asc, desc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Checkbox } from "expo-checkbox";
-import { useState } from "react";
+import * as Notifications from "expo-notifications";
+import { useEffect, useState } from "react";
 import {
+  Alert,
+  Button,
   Dimensions,
   KeyboardAvoidingView,
   Pressable,
@@ -29,11 +32,9 @@ import { useTheme } from "../constants/theme";
 const { width, height } = Dimensions.get("window");
 const DEFAULT_REMINDER: NewReminder = {
   name: "TEST1",
-  month: 6,
-  date: 1,
+  date: new Date(),
   weekday: 0,
-  hour: 12,
-  min: 0,
+  time: new Date(),
   repeating: false,
   repeatList: [],
 };
@@ -57,90 +58,49 @@ function getCurrDate() {
 //current time values should be moved to a different function
 function CreateReminder(
   name: string,
-  month: number,
-  date: number,
+  date: Date,
   weekday: number,
-  hour: number,
-  dayHalf: boolean,
-  min: number,
+  time: Date,
   repeating: boolean,
   repeatList: boolean[],
 ) {
   //this function should control the popup view for entering info
   //main page or app should wait for
-  if (!dayHalf) {
-    hour += 12;
-  }
-  new Reminder_class(name, month, date, weekday, hour, min, repeating, repeatList);
+  new Reminder_class(name, date, weekday, time, repeating, repeatList);
 
   const added_reminder: NewReminder = {
     name: name,
-    month: month,
     date: date,
     weekday: weekday,
-    hour: hour,
-    min: min,
+    time: time,
     repeating: repeating,
     repeatList: repeatList,
   };
 
   storeRem(added_reminder);
 }
-/**
-function testing() {
-  const [popup, setPopup] = useState(false);
-  return (
-    <View style={styles.container}>
-      <Pressable onPress={() => setPopup(true)}>
-        <Text>ya boy is testing</Text>
-      </Pressable>
 
-      {popup && (
-        <View style={styles.button}>
-          <Text>will this show up</Text>
-          <Pressable onPress={() => setPopup(false)}>
-            <Text style={styles.button}>close</Text>
-          </Pressable>
-        </View>
-      )}
-    </View>
-  );
-}*/
 
 class Reminder_class {
   name: string;
+  date: Date;
+  weekday: number;
+  time: Date;
   repeats: boolean;
   rep_list: boolean[];
-  curr_day: number = 3; //testing value, should be set for days of the week
-
-  /*for starting purposes kept as seperate values,
-   *could be set as one fixed length string of numbers in the
-   *format of:
-   *{1-digit: day}{2-digit: hour}{2-digit: minute}
-   */
-  time_month: number;
-  time_date: number;
-  time_weekday: number;
-  time_hour: number;
-  time_minute: number;
 
   constructor(
     name: string,
-    month: number,
-    date: number,
+    date: Date,
     weekday: number,
-    hour: number,
-    min: number,
+    time: Date,
     repeating: boolean,
     repeatList: boolean[],
   ) {
     this.name = name;
-    this.time_month = month;
-    this.time_date = date;
-    this.time_weekday = weekday;
-    this.time_hour = hour;
-    this.time_minute = min;
-
+    this.date = date;
+    this.weekday = weekday;
+    this.time = time;
     this.repeats = repeating;
     this.rep_list = repeatList;
   }
@@ -149,6 +109,23 @@ class Reminder_class {
 async function storeRem(reminder: NewReminder) {
   try {
     await db.insert(reminders).values(reminder);
+  } catch (error) {
+    console.error(error);
+  }
+}
+/*
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+*/
+
+async function clearRemList() {
+  try {
+    await db.delete(reminders);
   } catch (error) {
     console.error(error);
   }
@@ -166,60 +143,98 @@ export default function NotificationsTab() {
   //main function output to the screen
   const [newRem, setNewRem] = useState<NewReminder>(DEFAULT_REMINDER);
   const { data: notifList } = useLiveQuery(
-    db.select().from(reminders).orderBy(asc(reminders.month), asc(reminders.date)),
+    db.select().from(reminders).orderBy(asc(reminders.date)),
   );
   const curr = new Date();
   const theme = useTheme();
   const [repeats, setRepeat] = useState(false);
-  const repeatList = Array(7).fill(false);
-  const [name, setName] = useState("");
-  const [hour, setHour] = useState(12);
-  const [min, setMin] = useState(0);
-  const [half, setHalf] = useState(false);
-  const [course, setCourse] = useState("");
+  const [repeatList, resetList] = useState(Array(7).fill(false));
   const [popup, setPopup] = useState(false);
-  const [remindMonth, selectMonth] = useState(curr.getMonth() + 1);
-  const [remindStart, setStartDate] = useState(curr.getDate());
+  const [name, setName] = useState("");
+  const [selectedTime, setSelectedTime] = useState(curr);
+  const [course, setCourse] = useState("");
+  const [monthDate, setMonthDate] = useState(curr);
   const [modalVisible, setModalVisible] = useState(false);
+  const [dateVisible, setDateVisible] = useState(false);
+  const [clockVisible, setClockVisible] = useState(false);
+  /*
+  useEffect(() => {
+    // 2. Request permissions on component mount
+    registerForPushNotificationsAsync();
+  }, []);
 
+  async function registerForPushNotificationsAsync() {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      Alert.alert("Permission required", "Failed to get push token for notifications!");
+      return;
+    }
+  }*/
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-
+      {!popup && (
+        <ThemedView style={styles.resetButton}>
+          <Pressable
+            //what happens when the button is pressed
+            onPress={() => {
+              clearRemList();
+            }}
+            //determines look of the button
+            style={({ pressed }) => [styles.button, { backgroundColor: "#4f6eb7" }]}
+          >
+            {({ pressed }) => <Text style={styles.buttonText}>Clear ALL</Text>}
+          </Pressable>
+        </ThemedView>
+      )}
       {/**dissapear when adding */}
       {!popup && (
-      <ThemedView style={styles.createButton}>
-      <Pressable
-        //what happens when the button is pressed
-        onPress={() => {
-          setPopup(true);
-        }}
-        //determines look of the button
-        style={({ pressed }) => [styles.button, { backgroundColor: "#4f6eb7" }]}
-      >
-        {({ pressed }) => <Text style={styles.buttonText}>New Reminder</Text>}
-      </Pressable>
-      </ThemedView>
-    )}
+        <ThemedView style={styles.createButton}>
+          <Pressable
+            //what happens when the button is pressed
+            onPress={() => {
+              setModalVisible(true);
+            }}
+            //determines look of the button
+            style={({ pressed }) => [styles.button, { backgroundColor: "#4f6eb7" }]}
+          >
+            {({ pressed }) => <Text style={styles.buttonText}>New Reminder</Text>}
+          </Pressable>
+        </ThemedView>
+      )}
 
       {/**reworking popup to match format of other tabs */}
-      {/**
+
       <ThemedModal
         visible={modalVisible}
         title="Create Reminder"
         onClose={() => setModalVisible(false)}
         onSave={() => {
           // Save the new reminder to the database
-
+          const weekday = monthDate.getDay();
+          //creates a reminder class object locally, and adds reminder to the database
+          CreateReminder(name, monthDate, weekday, selectedTime, repeats, repeatList);
+          setName("");
+          setMonthDate(curr);
+          setSelectedTime(curr);
+          setRepeat(false);
+          resetList(Array(7).fill(false));
           setModalVisible(false);
         }}
       >
         <ThemedText>Add Reminder</ThemedText>
-        {/* Assignment Title Input *}
+        {/* Reminder Name Input */}
         <ThemedTextInput
-          placeholder="Reminder name"
-          value={newRem.name || ""}
+          placeholder="Reminder Name"
+          value={name || ""}
           onChangeText={(title) => {
-            setNewRem((prev) => ({ ...prev, title }));
+            setName(title);
           }}
         />
         <View
@@ -228,28 +243,37 @@ export default function NotificationsTab() {
             alignItems: "center",
           }}
         >
-          {/* Button to open date selection *}
+          {/* Button to open date selection */}
           <Button
-            title={newDT.date ? newDT.date.toDateString() : "Set Due Date"}
+            title={`Remind me on: ${(monthDate.getMonth() + 1)}/${monthDate.getDate()}`}
             onPress={() => setDateVisible(true)}
           />
-          {/* Assignment Time Input *}
-          <ThemedTextInput
-            placeholder="00:00"
-            value={newDT.time}
-            keyboardType="numeric"
-            onChangeText={(time) => {
-              time = parseTime(time) || newDT.time;
-              setNewDT((prev) => ({ ...prev, time: time }));
-            }}
+          <Button
+            title={`AT: ${selectedTime.toLocaleTimeString('en-US',{ hour: '2-digit', minute: '2-digit', hour12: true})}`}
+            onPress={() => setClockVisible(true)}
           />
         </View>
+        {/* Reminder Time Input */}
+          {clockVisible && (
+          <DateTimePicker
+            mode="time"
+            value={selectedTime}
+            is24Hour={false}
+            presentation="dialog"
+            onValueChange={(event, date) => {
+              setSelectedTime(date);
+              setClockVisible(false);
+            }}
+            onDismiss={() => setClockVisible(false)}
+            positiveButton={{ label: "Set" }}
+          />
+          )}
         {dateVisible && (
           <DateTimePicker
             mode="date"
-            value={newDT.date || new Date()}
-            onValueChange={(event_, date) => {
-              setNewDT((prev) => ({ ...prev, date }));
+            value={monthDate}
+            onValueChange={(event, date) => {
+              setMonthDate(date);
               setDateVisible(false);
             }}
             onDismiss={() => setDateVisible(false)}
@@ -257,7 +281,6 @@ export default function NotificationsTab() {
           />
         )}
       </ThemedModal>
-      */}
 
       {/* List of reminders (from db) */}
       <Animated.FlatList
@@ -265,18 +288,18 @@ export default function NotificationsTab() {
         keyExtractor={(item: Reminder) => item.name}
         itemLayoutAnimation={LinearTransition.delay(50)}
         contentContainerStyle={{
-          paddingTop: 10,
+          paddingTop:  useSafeAreaInsets().top + 10,
           paddingHorizontal: 16,
           gap: 8,
         }}
         ListEmptyComponent={<ThemedText>No Reminders Yet.</ThemedText>}
-        renderItem={({ item }) => (
-          <ListItem
-            title={item.name}
-            onPress={() => {}}
+        renderItem={({ item }) => 
+        <ListItem 
+          title={item.name} 
+          subtitle={`${(item.date).getMonth() + 1}/${(item.date).getDate()} 
+${selectedTime.toLocaleTimeString('en-US',{ hour: '2-digit', minute: '2-digit', hour12: true})}`}
+          onPress={() => {}} />}
           
-          />
-        )}
       ></Animated.FlatList>
 
       {popup && (
@@ -331,71 +354,9 @@ export default function NotificationsTab() {
             />
           </View>
           {/*third line of popup, time*/}
-          <View
-            style={[
-              styles.rowPop,
-              {
-                backgroundColor: theme.backgroundElement,
-                flexDirection: "row",
-                alignItems: "center",
-              },
-            ]}
-          >
-            <Text style={[styles.buttonText, { color: theme.text }]}>Enter time:</Text>
-            <TextInput
-              placeholder="Hour"
-              placeholderTextColor={theme.text}
-              onChangeText={(newText) => setHour(Number(checkNum(newText, 1, 12)))}
-              defaultValue={String(hour)}
-              keyboardType="number-pad"
-              style={[styles.defaultText, { borderColor: theme.text, color: theme.text }]}
-            />
-            <Text style={[styles.buttonText, { color: theme.text }]}>:</Text>
-            <TextInput
-              placeholder="Minute"
-              placeholderTextColor={theme.text}
-              onChangeText={(newText) => setMin(Number(checkNum(newText, 0, 59)))}
-              defaultValue={"00"}
-              keyboardType="number-pad"
-              style={[styles.defaultText, { borderColor: theme.text, color: theme.text }]}
-            />
-            <Pressable onPress={() => setHalf(!half)}>
-              <Text style={[styles.roundButton, { color: theme.text, backgroundColor: "grey" }]}>
-                {half ? "AM" : "PM"}
-              </Text>
-            </Pressable>
-          </View>
+          
           {/*fourth line of popup, date*/}
-          <View
-            style={[
-              styles.rowPop,
-              {
-                backgroundColor: theme.backgroundElement,
-                flexDirection: "row",
-                alignItems: "center",
-              },
-            ]}
-          >
-            <Text style={[styles.buttonText, { color: theme.text }]}>Start date(M/D): </Text>
-            <TextInput
-              placeholder="Month"
-              placeholderTextColor={theme.text}
-              onChangeText={(newText) => selectMonth(Number(checkNum(newText, 1, 12)))}
-              defaultValue={String(remindMonth)}
-              keyboardType="number-pad"
-              style={[styles.defaultText, { borderColor: theme.text, color: theme.text }]}
-            />
-            <Text style={[styles.buttonText, { color: theme.text }]}>/</Text>
-            <TextInput
-              placeholder="Day"
-              placeholderTextColor={theme.text}
-              //edit parameter 31 to adjust to the month selected later
-              onChangeText={(newText) => setStartDate(Number(checkNum(newText, 1, 31)))}
-              defaultValue={String(remindStart)}
-              keyboardType="number-pad"
-              style={[styles.defaultText, { borderColor: theme.text, color: theme.text }]}
-            />
-          </View>
+          
           {/*fifth line of popup*/}
           <View
             style={[
@@ -514,21 +475,9 @@ export default function NotificationsTab() {
             <Pressable
               //what happens when the button is pressed
               onPress={() => {
-                const today = curr.getDay();
-                //creates a reminder class object locally
-
-                //adds a reminder to the database:
-                CreateReminder(
-                  name,
-                  remindMonth,
-                  remindStart,
-                  today,
-                  hour,
-                  half,
-                  min,
-                  repeats,
-                  repeatList,
-                );
+                const today = monthDate.getDay();
+                //creates a reminder class object locally, and adds reminder to the database
+                CreateReminder(name, monthDate, today, selectedTime, repeats, repeatList);
               }} //determines look of the button
               style={({ pressed }) => [styles.button, { backgroundColor: "#4f6eb7" }]}
             >
@@ -554,7 +503,7 @@ export default function NotificationsTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1, // Fills the entire screen
-     // Centers items vertically
+    // Centers items vertically
   },
   popup: {
     width: width * 0.95,
@@ -592,11 +541,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    elevation: 3, // Android shadow
-    shadowColor: "#000", // iOS shadow
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
   roundButton: {
     paddingVertical: 4,
@@ -637,9 +581,9 @@ const styles = StyleSheet.create({
   resetButton: {
     position: "absolute",
     bottom: 16,
-    right: 16,
+    left: 16,
     height: 56,
     borderRadius: 8,
     zIndex: 10,
-  }
+  },
 });
