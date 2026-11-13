@@ -169,10 +169,11 @@ export default function Assignments() {
             value={newDT.time || new Date()}
             onValueChange={(event_, time) => {
               setNewDT((prev) => ({ ...prev, time }));
-              setDateVisible(false);
+              setTimeVisible(false);
             }}
-            onDismiss={() => setDateVisible(false)}
+            onDismiss={() => setTimeVisible(false)}
             positiveButton={{ label: "Set" }}
+
           />
         )}
         <SelectList
