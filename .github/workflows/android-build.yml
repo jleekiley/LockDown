@@ -79,13 +79,18 @@ jobs:
         run: |
           chmod +x gradlew
           TASKS=""
+          ARCHS="arm64-v8a"
           if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "both" ]; then
             TASKS="$TASKS assembleDebug"
           fi
           if [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "both" ]; then
             TASKS="$TASKS assembleRelease"
+            ARCHS="armeabi-v7a,arm64-v8a"
           fi
-          ./gradlew $TASKS --no-daemon
+          ./gradlew $TASKS \
+            -PreactNativeArchitectures="$ARCHS" \
+            --build-cache \
+            --no-daemon
 
       - name: Collect APK outputs
         env:

@@ -40,6 +40,8 @@ on:
 jobs:
   build-ios:
     runs-on: macos-latest
+    env:
+      USE_CCACHE: "1"
 
     steps:
       - name: Checkout repository
@@ -56,6 +58,12 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ runner.os }}-ios-${{ inputs.configuration || 'Debug' }}
+          max-size: 1G
+
       - name: Install JS dependencies
         run: pnpm install --frozen-lockfile
 
@@ -65,7 +73,10 @@ jobs:
       - name: Cache CocoaPods
         uses: actions/cache@v4
         with:
-          path: ~/Library/Caches/CocoaPods
+          path: |
+            ios/Pods
+            ios/Podfile.lock
+            ~/Library/Caches/CocoaPods
           key: ${{ runner.os }}-pods-${{ hashFiles('package.json', 'pnpm-lock.yaml', 'app.json', 'modules/**/*.podspec') }}
           restore-keys: |
             ${{ runner.os }}-pods-
