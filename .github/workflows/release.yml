@@ -1,0 +1,42 @@
+name: Tagged Release (Android APK + iOS IPA)
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    uses: ./.github/workflows/android-build.yml
+    with:
+      build_type: "both"
+      version_tag: ${{ github.ref_name }}
+      artifact_name: LockDown-android-apk
+
+  build-ios:
+    uses: ./.github/workflows/ios-build.yml
+    with:
+      configuration: ${{ contains(github.ref_name, '-dev') && 'Debug' || 'Release' }}
+      ipa_filename: LockDown-${{ github.ref_name }}-ios-${{ contains(github.ref_name, '-dev') && 'dev' || 'release' }}.ipa
+      artifact_name: LockDown-ios-ipa
+
+  release:
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
