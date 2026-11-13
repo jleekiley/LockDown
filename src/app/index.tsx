@@ -12,7 +12,8 @@ import { assignments } from "@/db/schema";
 import { ListItem } from "@/components/list-item";
 import { Goal } from "@/db/schema";
 import Checkbox from "expo-checkbox";
-import { ScrollView } from "react-native";
+import { View } from "react-native";
+import { navigate } from "expo-router/build/global-state/router";
 
 
 
@@ -25,40 +26,46 @@ export default function Index() {
     db.select().from(assignments).orderBy(desc(assignments.dueDate),desc(assignments.title))
     )
   return(
-  <ThemedView style={[styles.list]}>
-    <ThemedText>Welcome to LockDown</ThemedText>
-    <ScrollView style = {[styles.list]}>
-    <Animated.FlatList
-            data={assignmentlist}
-            keyExtractor={(item: Assignment) => item.id.toString()}
-            itemLayoutAnimation={LinearTransition.delay(50)}
-            ListEmptyComponent={<ThemedText>No assignments found.</ThemedText>}
-            renderItem={({ item }) => (
-              <ListItem
-                title={item.title}
-                subtitle={item.description}
-                onPress={() => {}}
-              />
-            )}
-          ></Animated.FlatList>
-    </ScrollView>
-    <ScrollView style = {[styles.list]}>
-    <Animated.FlatList
-            data={goallist}
-            keyExtractor={(item: Goal) => item.id.toString()}
-            itemLayoutAnimation={LinearTransition.delay(50)}
-            ListEmptyComponent={<ThemedText>No goals found.</ThemedText>}
-            renderItem={({ item }) => (
-              <ListItem
-                title={item.title}
-                subtitle={item.description}
-                onPress={() => {}}
-              />
-            )}
-          ></Animated.FlatList> 
-      </ScrollView>  
+
+    <>
+    <ThemedView style = {[styles.container]}>
+      <ThemedText style = {[styles.title]}>Welcome to Lockdown</ThemedText>
+    </ThemedView>
+    <ThemedView style={[styles.list]}>
+      <Animated.FlatList
+        data={assignmentlist}
+        keyExtractor={(item: Assignment) => item.id.toString()}
+        itemLayoutAnimation={LinearTransition.delay(50)}
+        ListEmptyComponent={<ThemedText>No assignments found.</ThemedText>}
+        renderItem={({ item }) => (
+          <ListItem
+            title={item.title}   
+            subtitle={item.description}
+            onPress={() => { 
+                navigate('/assignments')
+              } }
+          ></ListItem>  
+        )}
+      ></Animated.FlatList>
+    </ThemedView><ThemedView style={[styles.list]}>
+        <Animated.FlatList
+          data={goallist}
+          keyExtractor={(item: Goal) => item.id.toString()}
+          itemLayoutAnimation={LinearTransition.delay(50)}
+          ListEmptyComponent={<ThemedText>No goals found.</ThemedText>}
+          renderItem={({ item }) => (
+            <ListItem
+              title={item.title}
+              subtitle={item.description}
+              onPress={() => { 
+                navigate('/goals')
+              } } />
+          )}
+        ></Animated.FlatList>
+      </ThemedView></>
+
             
-      </ThemedView>)
+   )
 }
 const styles = StyleSheet.create({
   container: {
@@ -68,15 +75,21 @@ const styles = StyleSheet.create({
   },
   list:
   {
-    flex: 1
+    flex: 1,
+
   },
   title: {
-    height: "80%",
+    height: "50%",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 20,
+    fontSize: 30,
   },
   subtitle: {
     fontSize: 18,
   },
+  left_info: {
+    margin: 16,
+    maxWidth: 25
+  },
+  
 });

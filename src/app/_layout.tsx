@@ -5,6 +5,7 @@ import {
   SplashScreen,
   ThemeProvider,
 } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -131,6 +132,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <StatusBar style="auto" />
       <AppTabs />
     </ThemeProvider>
   );

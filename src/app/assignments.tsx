@@ -1,9 +1,11 @@
+/** biome-ignore-all lint/correctness/useParseIntRadix: error cannot occur given context */
 import DateTimePicker from "@expo/ui/community/datetime-picker";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Checkbox } from "expo-checkbox";
 import { useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ListItem } from "@/components/list-item";
@@ -25,7 +27,7 @@ export default function Assignments() {
   };
   const INITIAL_DT: DT = {
     date: new Date(),
-    time: "00:00",
+    time: new Date(),
   };
 
   const [newTask, setNewTask] = useState<NewAssignment>(INITIAL_ASSIGNMENT);
@@ -33,6 +35,7 @@ export default function Assignments() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [dateVisible, setDateVisible] = useState(false);
+  const [timeVisible, setTimeVisible] = useState(false);
   // Theming
   const insets = useSafeAreaInsets();
   const theme = useTheme();
@@ -41,7 +44,7 @@ export default function Assignments() {
     db
       .select()
       .from(assignments)
-      .orderBy(asc(assignments.dueDate), desc(assignments.id)),
+      .orderBy(asc(assignments.complete), asc(assignments.dueDate), asc(assignments.id)),
   );
 
   const toggleTask = async (task: Assignment) => {
@@ -51,7 +54,7 @@ export default function Assignments() {
         .set({ complete: !task.complete })
         .where(eq(assignments.id, task.id));
     } catch (err) {
-      console.error("Failed to toggle goal:", err);
+      console.error("Failed to toggle assignment:", err);
     }
   };
 
@@ -108,8 +111,8 @@ export default function Assignments() {
         onSave={() => {
           // Save the new assignment to the database
           const tempDate = newDT.date || new Date();
-          tempDate.setHours(parseInt(newDT.time.split(":")[0]) || 0);
-          tempDate.setMinutes(parseInt(newDT.time.split(":")[1]) || 0);
+          tempDate.setHours(newDT.time.getHours());
+          tempDate.setMinutes(newDT.time.getMinutes());
           addTask({ ...newTask, dueDate: tempDate });
           setModalVisible(false);
         }}
@@ -142,15 +145,10 @@ export default function Assignments() {
             title={newDT.date ? newDT.date.toDateString() : "Set Due Date"}
             onPress={() => setDateVisible(true)}
           />
-          {/* Assignment Time Input */}
-          <ThemedTextInput
-            placeholder="00:00"
-            value={newDT.time}
-            keyboardType="numeric"
-            onChangeText={(time) => {
-              time = parseTime(time) || newDT.time;
-              setNewDT((prev) => ({ ...prev, time: time }));
-            }}
+          {/* Button to pull up Assignment Time Input */}
+          <Button
+            title={newDT.time.toTimeString() || "Set Due Time"}
+            onPress={() => setTimeVisible(true)}
           />
         </View>
         {dateVisible && (
@@ -165,12 +163,45 @@ export default function Assignments() {
             positiveButton={{ label: "Set" }}
           />
         )}
+        {timeVisible && (
+          <DateTimePicker
+            mode="time"
+            value={newDT.time || new Date()}
+            onValueChange={(event_, time) => {
+              setNewDT((prev) => ({ ...prev, time }));
+              setDateVisible(false);
+            }}
+            onDismiss={() => setDateVisible(false)}
+            positiveButton={{ label: "Set" }}
+          />
+        )}
+        <SelectList
+          setSelected={(key: string) => {
+            setNewTask((prev) => ({
+              ...prev,
+              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
+            }));
+          }}
+          data={[
+            { key: "none", value: "-- none --" },
+            ...(tasksList?.map((task) => ({ key: task.id.toString(), value: task.title })) ?? []),
+          ]}
+          save="key"
+          onSelect={(key?: string) => {
+            setNewTask((prev) => ({
+              ...prev,
+              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
+            }));
+          }}
+        />
       </ThemedModal>
       <ThemedView style={styles.container2}>
         <ThemedText>Active Assignments</ThemedText>
         {/* Button for adding assignments (Triggers Modal Popup) */}
         <Button
           onPress={() => {
+            setNewTask(INITIAL_ASSIGNMENT);
+            setNewDT(INITIAL_DT);
             setModalVisible(true);
           }}
           title="add +"
@@ -192,7 +223,8 @@ export default function Assignments() {
         renderItem={({ item }) => (
           <ListItem
             title={item.title}
-            subtitle={item.description}
+            subtitle={`${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}`}
+            strikethrough={item.complete}
             onPress={() => {}}
             leading={
               <Checkbox
@@ -203,14 +235,14 @@ export default function Assignments() {
             }
           />
         )}
-      ></Animated.FlatList>
+      />
     </ThemedView>
   );
 }
 
 export type DT = {
   date: Date;
-  time: string;
+  time: Date;
 };
 
 // Awesome Styles that are not evil
@@ -221,5 +253,9 @@ const styles = StyleSheet.create({
   container2: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  strikethrough: {
+    textDecorationLine: "line-through",
+    opacity: 0.5,
   },
 });
