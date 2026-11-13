@@ -27,7 +27,7 @@ export default function Assignments() {
   };
   const INITIAL_DT: DT = {
     date: new Date(),
-    time: "00:00",
+    time: new Date(),
   };
 
   const [newTask, setNewTask] = useState<NewAssignment>(INITIAL_ASSIGNMENT);
@@ -35,6 +35,7 @@ export default function Assignments() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [dateVisible, setDateVisible] = useState(false);
+  const [timeVisible, setTimeVisible] = useState(false);
   // Theming
   const insets = useSafeAreaInsets();
   const theme = useTheme();
@@ -110,8 +111,8 @@ export default function Assignments() {
         onSave={() => {
           // Save the new assignment to the database
           const tempDate = newDT.date || new Date();
-          tempDate.setHours(parseInt(newDT.time.split(":")[0]) || 0);
-          tempDate.setMinutes(parseInt(newDT.time.split(":")[1]) || 0);
+          tempDate.setHours(newDT.time.getHours());
+          tempDate.setMinutes(newDT.time.getMinutes());
           addTask({ ...newTask, dueDate: tempDate });
           setModalVisible(false);
         }}
@@ -144,15 +145,10 @@ export default function Assignments() {
             title={newDT.date ? newDT.date.toDateString() : "Set Due Date"}
             onPress={() => setDateVisible(true)}
           />
-          {/* Assignment Time Input */}
-          <ThemedTextInput
-            placeholder="00:00"
-            value={newDT.time}
-            keyboardType="numeric"
-            onChangeText={(time) => {
-              time = parseTime(time) || newDT.time;
-              setNewDT((prev) => ({ ...prev, time: time }));
-            }}
+          {/* Button to pull up Assignment Time Input */}
+          <Button
+            title={newDT.time.toTimeString() || "Set Due Time"}
+            onPress={() => setTimeVisible(true)}
           />
         </View>
         {dateVisible && (
@@ -161,6 +157,18 @@ export default function Assignments() {
             value={newDT.date || new Date()}
             onValueChange={(event_, date) => {
               setNewDT((prev) => ({ ...prev, date }));
+              setDateVisible(false);
+            }}
+            onDismiss={() => setDateVisible(false)}
+            positiveButton={{ label: "Set" }}
+          />
+        )}
+        {timeVisible && (
+          <DateTimePicker
+            mode="time"
+            value={newDT.time || new Date()}
+            onValueChange={(event_, time) => {
+              setNewDT((prev) => ({ ...prev, time }));
               setDateVisible(false);
             }}
             onDismiss={() => setDateVisible(false)}
@@ -234,7 +242,7 @@ export default function Assignments() {
 
 export type DT = {
   date: Date;
-  time: string;
+  time: Date;
 };
 
 // Awesome Styles that are not evil
