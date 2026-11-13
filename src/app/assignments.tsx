@@ -147,7 +147,7 @@ export default function Assignments() {
           />
           {/* Button to pull up Assignment Time Input */}
           <Button
-            title={newDT.time.toTimeString() || "Set Due Time"}
+            title={newDT.time.toTimeString().split(" ")[0].slice(0,-3) || "Set Due Time"}
             onPress={() => setTimeVisible(true)}
           />
         </View>
@@ -173,7 +173,6 @@ export default function Assignments() {
             }}
             onDismiss={() => setTimeVisible(false)}
             positiveButton={{ label: "Set" }}
-
           />
         )}
         <SelectList
