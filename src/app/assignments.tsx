@@ -147,7 +147,7 @@ export default function Assignments() {
           />
           {/* Button to pull up Assignment Time Input */}
           <Button
-            title={newDT.time.toTimeString().trim().split(" ")[0].slice(0,-3) || "Set Due Time"}
+            title={newDT.time.toLocaleTimeString("en-US",{second: undefined, hour12: true, timeZoneName: undefined})|| "Set Due Time"}
             onPress={() => setTimeVisible(true)}
           />
         </View>
