@@ -3,7 +3,7 @@ import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { asc, eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Checkbox } from "expo-checkbox";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, StyleSheet, View } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 import Animated, { LinearTransition } from "react-native-reanimated";
@@ -74,6 +74,12 @@ export default function Assignments() {
       throw error;
     }
   };
+
+  const parentByID = useMemo(
+    () => new Map(tasksList?.map((t) => [t.id, t]) ?? []),
+    [tasksList],
+  );
+
 
   const parseTime = (time: string) => {
     let cleaned = time.replace(/[^0-9]/g, "");
@@ -151,6 +157,29 @@ export default function Assignments() {
             onPress={() => setTimeVisible(true)}
           />
         </View>
+        <ThemedText>
+          Required By:
+        </ThemedText>
+        <SelectList
+          setSelected={(key: string) => {
+            key == "" ? key = "-- none --" : null;
+            setNewTask((prev) => ({
+              ...prev,
+              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
+            }));
+          }}
+          data={[
+            { key: "none", value: "-- none --" },
+            ...(tasksList?.map((task) => ({ key: task.id.toString(), value: task.title })) ?? []),
+          ]}
+          save="key"
+          onSelect={(key?: string) => {
+            setNewTask((prev) => ({
+              ...prev,
+              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
+            }));
+          }}
+        />
         {dateVisible && (
           <DateTimePicker
             mode="date"
@@ -177,25 +206,6 @@ export default function Assignments() {
             positiveButton={{ label: "Set" }}
           />
         )}
-        <SelectList
-          setSelected={(key: string) => {
-            setNewTask((prev) => ({
-              ...prev,
-              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
-            }));
-          }}
-          data={[
-            { key: "none", value: "-- none --" },
-            ...(tasksList?.map((task) => ({ key: task.id.toString(), value: task.title })) ?? []),
-          ]}
-          save="key"
-          onSelect={(key?: string) => {
-            setNewTask((prev) => ({
-              ...prev,
-              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
-            }));
-          }}
-        />
       </ThemedModal>
       <ThemedView style={styles.container2}>
         <ThemedText>Active Assignments</ThemedText>
@@ -225,7 +235,7 @@ export default function Assignments() {
         renderItem={({ item }) => (
           <ListItem
             title={item.title}
-            subtitle={`${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}`}
+            subtitle={`${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}${item.parentTaskId != null ? `\nRequired By: ${parentByID.get(item.parentTaskId)}` : ``}`}
             strikethrough={item.complete}
             onPress={() => {}}
             leading={
