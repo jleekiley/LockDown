@@ -1,0 +1,115 @@
+name: iOS Build (Unsigned IPA)
+
+on:
+  workflow_call:
+    inputs:
+      configuration:
+        description: "Xcode build configuration (Debug or Release)"
+        required: false
+        type: string
+        default: "Debug"
+      ipa_filename:
+        description: "Output IPA filename"
+        required: false
+        type: string
+        default: ""
+      artifact_name:
+        description: "GitHub Actions artifact name"
+        required: false
+        type: string
+        default: "LockDown-ios-ipa"
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: "Build configuration (Debug = dev client, Release = standalone)"
+        required: false
+        type: choice
+        options:
+          - Debug
+          - Release
+        default: Debug
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "app.json"
+      - "modules/**"
+      - ".github/workflows/ios-build.yml"
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.11.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate native iOS project
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/CocoaPods
+          key: ${{ runner.os }}-pods-${{ hashFiles('package.json', 'pnpm-lock.yaml', 'app.json', 'modules/**/*.podspec') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: pod install
+
+      - name: Build unsigned .app
+        env:
+          BUILD_CONFIG: ${{ inputs.configuration || 'Debug' }}
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -workspace ios/LockDown.xcworkspace \
+            -scheme LockDown \
+            -configuration "$BUILD_CONFIG" \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package unsigned .ipa
+        env:
+          BUILD_CONFIG: ${{ inputs.configuration || 'Debug' }}
+          IPA_FILENAME: ${{ inputs.ipa_filename }}
+        run: |
+          if [ -z "$IPA_FILENAME" ]; then
+            if [ "$BUILD_CONFIG" = "Release" ]; then
+              IPA_FILENAME="LockDown-ios-release.ipa"
+            else
+              IPA_FILENAME="LockDown-ios-dev.ipa"
+            fi
+          fi
+          mkdir -p build/ipa/Payload
+          cp -R "build/DerivedData/Build/Products/${BUILD_CONFIG}-iphoneos/LockDown.app" build/ipa/Payload/
+          cd build/ipa
+          zip -r "../${IPA_FILENAME}" Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name || 'LockDown-ios-ipa' }}
+          path: build/*.ipa
+          retention-days: 14
