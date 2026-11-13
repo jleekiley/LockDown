@@ -167,6 +167,8 @@ export default function Assignments() {
           <DateTimePicker
             mode="time"
             value={newDT.time || new Date()}
+            is24Hour={false}
+            presentation="dialog"
             onValueChange={(event_, time) => {
               setNewDT((prev) => ({ ...prev, time }));
               setTimeVisible(false);

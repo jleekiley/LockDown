@@ -26,11 +26,9 @@ export const assignments = sqliteTable("assignments", {
 export const reminders = sqliteTable("reminders", {
   id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
-  month: int().notNull(),
-  date: int().notNull(),
+  date: int({ mode: "timestamp_ms" }).notNull(),
   weekday: int().notNull(),
-  hour: int().notNull(),
-  min: int().notNull(),
+  time: int({ mode: "timestamp_ms" }).notNull(),
   repeating: int({ mode: "boolean" }).notNull().default(false),
   repeatList: text({ mode: "json" }).$type<boolean[]>().notNull().default([]),
 });
@@ -39,3 +37,5 @@ export type Goal = typeof goals.$inferSelect;
 export type NewGoal = typeof goals.$inferInsert;
 export type Assignment = typeof assignments.$inferSelect;
 export type NewAssignment = typeof assignments.$inferInsert;
+export type Reminder = typeof reminders.$inferSelect;
+export type NewReminder = typeof reminders.$inferInsert;
