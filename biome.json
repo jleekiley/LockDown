@@ -23,11 +23,11 @@
         "noUnusedVariables": "warn",
         "noUnusedFunctionParameters": "off",
         "useHookAtTopLevel": "error",
-        "useExhaustiveDependencies": "warn"
+        "useExhaustiveDependencies": "error"
       },
       "suspicious": {
         "noDoubleEquals": {
-          "level": "warn",
+          "level": "error",
           "options": {
             "ignoreNull": true
           }
