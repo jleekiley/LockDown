@@ -80,33 +80,6 @@ export default function Assignments() {
     [tasksList],
   );
 
-
-  const parseTime = (time: string) => {
-    let cleaned = time.replace(/[^0-9]/g, "");
-    // Limit maximum length to 4 digits (HHMM)
-    if (cleaned.length > 4) {
-      cleaned = cleaned.slice(0, 4);
-    }
-    // Prevent invalid first digits for hour (max 2)
-    if (cleaned.length >= 1 && parseInt(cleaned[0]) > 2) {
-      return;
-    }
-    // Prevent invalid second digits if first digit is 2 (max 23 hours)
-    if (cleaned.length >= 2 && cleaned[0] === "2" && parseInt(cleaned[1]) > 3) {
-      return;
-    }
-    // Prevent invalid first digit for minutes (max 59 minutes)
-    if (cleaned.length >= 3 && parseInt(cleaned[2]) > 5) {
-      return;
-    }
-    // Auto-insert colon after the first two digits
-    let formatted = cleaned;
-    if (cleaned.length > 2) {
-      formatted = `${cleaned.slice(0, 2)}:${cleaned.slice(2)}`;
-    }
-    return formatted;
-  };
-
   return (
     <ThemedView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Modal for adding assignments */}
@@ -162,7 +135,9 @@ export default function Assignments() {
         </ThemedText>
         <SelectList
           setSelected={(key: string) => {
-            key == "" ? key = "-- none --" : null;
+            if(key === ""){
+              key = "-- none --";
+            }
             setNewTask((prev) => ({
               ...prev,
               parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
