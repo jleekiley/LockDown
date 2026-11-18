@@ -138,10 +138,12 @@ export default function Assignments() {
             if(key === ""){
               key = "none";
             }
-            setNewTask((prev) => ({
-              ...prev,
-              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
-            }));
+            if(key !== "none"){
+              setNewTask((prev) => ({
+                ...prev,
+                parentTaskId: Number.parseInt(key, 10),
+              }));
+            }
           }}
           data={[
             { key: "none", value: "-- none --" },
@@ -149,10 +151,12 @@ export default function Assignments() {
           ]}
           save="key"
           onSelect={(key?: string) => {
-            setNewTask((prev) => ({
-              ...prev,
-              parentTaskId: key && key !== "none" ? Number.parseInt(key, 10) : null,
-            }));
+            if(key && key !== "none"){
+              setNewTask((prev) => ({
+                ...prev,
+                parentTaskId: Number.parseInt(key, 10),
+              }));
+            }
           }}
         />
         {dateVisible && (
@@ -210,7 +214,7 @@ export default function Assignments() {
         renderItem={({ item }) => (
           <ListItem
             title={item.title}
-            subtitle={`${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}${item.parentTaskId != null ? `\nRequired By: ${parentByID.get(item.parentTaskId)}` : ``}`}
+            subtitle={`${item.description}\nDue: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}${item.parentTaskId != null ? `\nRequired By: ${(parentByID.get(item.parentTaskId))?.title}` : ``}`}
             strikethrough={item.complete}
             onPress={() => {}}
             leading={
