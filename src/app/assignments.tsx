@@ -136,7 +136,7 @@ export default function Assignments() {
         <SelectList
           setSelected={(key: string) => {
             if(key === ""){
-              key = "-- none --";
+              key = "none";
             }
             setNewTask((prev) => ({
               ...prev,
