@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, Text } from "react-native";
 import { db } from "@/db/client";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { ThemedText } from "@/components/themed-text";
@@ -14,8 +14,14 @@ import { Goal } from "@/db/schema";
 import Checkbox from "expo-checkbox";
 import { View } from "react-native";
 import { navigate } from "expo-router/build/global-state/router";
+import { view } from "drizzle-orm/sqlite-core";
 
 
+export function header(type: any){
+  return(
+    <view><text>{type}</text></view>
+  );
+} 
 
 
 export default function Index() {
@@ -39,13 +45,15 @@ export default function Index() {
         ListEmptyComponent={<ThemedText>No assignments found.</ThemedText>}
         renderItem={({ item }) => (
           <ListItem
+            style ={[styles.bubble]}
             title={item.title}   
-            subtitle={item.description}
+            subtitle={`Due: ${item.dueDate ? new Date(item.dueDate).toLocaleString() : "No due date"}`}
             onPress={() => { 
                 navigate('/assignments')
               } }
           ></ListItem>  
         )}
+        ListHeaderComponent={()=><ThemedText>Assignments:</ThemedText>}
       ></Animated.FlatList>
     </ThemedView><ThemedView style={[styles.list]}>
         <Animated.FlatList
@@ -55,12 +63,14 @@ export default function Index() {
           ListEmptyComponent={<ThemedText>No goals found.</ThemedText>}
           renderItem={({ item }) => (
             <ListItem
+              style ={[styles.bubble]}
               title={item.title}
               subtitle={item.description}
               onPress={() => { 
                 navigate('/goals')
               } } />
           )}
+          ListHeaderComponent={()=><ThemedText>Goals:</ThemedText>}
         ></Animated.FlatList>
       </ThemedView></>
 
@@ -90,6 +100,13 @@ const styles = StyleSheet.create({
   left_info: {
     margin: 16,
     maxWidth: 25
-  },
+  }, bubble: {
+    borderColor: 'black',
+    borderWidth: 1 ,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius:20,
+    marginBottom:5
+  }
   
 });
