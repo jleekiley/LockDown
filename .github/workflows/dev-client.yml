@@ -1,0 +1,19 @@
+name: iOS Dev Client Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "app.json"
+      - "modules/**"
+      - ".github/workflows/dev-client.yml"
+
+jobs:
+  build-ios-dev:
+    uses: ./.github/workflows/ios-build.yml
+    with:
+      configuration: "Debug"
+      artifact_name: LockDown-ios-dev-ipa

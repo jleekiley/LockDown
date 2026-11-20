@@ -7,7 +7,7 @@ on:
         description: "APK build type (debug, release, or both)"
         required: false
         type: string
-        default: "both"
+        default: "release"
       version_tag:
         description: "Optional version tag prefix for APK filenames"
         required: false
@@ -21,21 +21,27 @@ on:
   workflow_dispatch:
     inputs:
       build_type:
-        description: "APK build type (debug = dev client, release = standalone)"
+        description: "APK build type (release = standalone, debug = dev client, both)"
         required: false
         type: choice
         options:
-          - debug
           - release
+          - debug
           - both
-        default: debug
+        default: release
   push:
     branches: [main]
     paths:
+      - "src/**"
+      - "assets/**"
+      - "drizzle/**"
+      - "modules/**"
+      - "app.json"
       - "package.json"
       - "pnpm-lock.yaml"
-      - "app.json"
-      - "modules/**"
+      - "babel.config.cjs"
+      - "metro.config.cjs"
+      - "tsconfig.json"
       - ".github/workflows/android-build.yml"
 
 jobs:
@@ -75,7 +81,7 @@ jobs:
       - name: Build Android APK(s)
         working-directory: android
         env:
-          BUILD_TYPE: ${{ inputs.build_type || 'debug' }}
+          BUILD_TYPE: ${{ inputs.build_type || 'release' }}
         run: |
           chmod +x gradlew
           TASKS=""

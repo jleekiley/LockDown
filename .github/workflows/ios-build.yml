@@ -7,7 +7,7 @@ on:
         description: "Xcode build configuration (Debug or Release)"
         required: false
         type: string
-        default: "Debug"
+        default: "Release"
       ipa_filename:
         description: "Output IPA filename"
         required: false
@@ -21,20 +21,26 @@ on:
   workflow_dispatch:
     inputs:
       configuration:
-        description: "Build configuration (Debug = dev client, Release = standalone)"
+        description: "Build configuration (Release = standalone, Debug = dev client)"
         required: false
         type: choice
         options:
-          - Debug
           - Release
-        default: Debug
+          - Debug
+        default: Release
   push:
     branches: [main]
     paths:
+      - "src/**"
+      - "assets/**"
+      - "drizzle/**"
+      - "modules/**"
+      - "app.json"
       - "package.json"
       - "pnpm-lock.yaml"
-      - "app.json"
-      - "modules/**"
+      - "babel.config.cjs"
+      - "metro.config.cjs"
+      - "tsconfig.json"
       - ".github/workflows/ios-build.yml"
 
 jobs:
@@ -61,7 +67,7 @@ jobs:
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1
         with:
-          key: ${{ runner.os }}-ios-${{ inputs.configuration || 'Debug' }}
+          key: ${{ runner.os }}-ios-${{ inputs.configuration || 'Release' }}
           max-size: 1G
 
       - name: Install JS dependencies
@@ -87,7 +93,7 @@ jobs:
 
       - name: Build unsigned .app
         env:
-          BUILD_CONFIG: ${{ inputs.configuration || 'Debug' }}
+          BUILD_CONFIG: ${{ inputs.configuration || 'Release' }}
         run: |
           set -o pipefail
           xcodebuild build \
@@ -103,7 +109,7 @@ jobs:
 
       - name: Package unsigned .ipa
         env:
-          BUILD_CONFIG: ${{ inputs.configuration || 'Debug' }}
+          BUILD_CONFIG: ${{ inputs.configuration || 'Release' }}
           IPA_FILENAME: ${{ inputs.ipa_filename }}
         run: |
           if [ -z "$IPA_FILENAME" ]; then

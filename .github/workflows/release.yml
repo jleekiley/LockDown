@@ -12,7 +12,7 @@ jobs:
   build-android:
     uses: ./.github/workflows/android-build.yml
     with:
-      build_type: "both"
+      build_type: ${{ contains(github.ref_name, '-dev') && 'debug' || 'release' }}
       version_tag: ${{ github.ref_name }}
       artifact_name: LockDown-android-apk
 
